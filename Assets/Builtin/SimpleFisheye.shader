@@ -64,7 +64,7 @@ Shader "UC/FisheyeSimple"
                 float2 p = i.coord * tan(dist * UNITY_HALF_PI) / tan(radians(_CameraFov) * 0.5) / dist;
                 
                 fixed4 col = tex2D(_MainTex, (p + 1) * 0.5);
-                col = lerp(col, _OutsideColor, step(_CameraFov/180.0, dist) * _OutsideColor.a);
+                col = lerp(col, _OutsideColor, step(_Fov/180.0, dist) * _OutsideColor.a);
                 return col;
             }
             ENDCG

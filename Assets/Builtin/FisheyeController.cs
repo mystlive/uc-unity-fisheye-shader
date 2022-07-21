@@ -12,7 +12,7 @@ namespace UC.Fisheye
         public Camera targetCamera;
         public enum LensType
         {
-            Diagonal, CircularHorizontal, CircularVertical
+            Diagonal, Circular, CircularHorizontal, CircularVertical
         }
 
         public LensType lens = LensType.Diagonal;
@@ -21,6 +21,8 @@ namespace UC.Fisheye
 
         [SerializeField, Range(1.0f, 180.0f)]
         public float fieldOfView = 180;
+        [SerializeField, Range(1.0f, 179.0f)]
+        public float centralFieldOfView = 80;
         [SerializeField, Range(1.0f, 179.0f)]
         public float peripheralFieldOfView = 170;
         [SerializeField]
@@ -41,6 +43,7 @@ namespace UC.Fisheye
             {
                 targetCamera = GetComponent<Camera>();
             }
+            targetCamera.fieldOfView = centralFieldOfView;
         }
         void OnPreCull()
         {
@@ -63,7 +66,7 @@ namespace UC.Fisheye
                 targetCamera.Render();
                 this.enabled = true;
                 targetCamera.targetTexture = t;
-                targetCamera.fieldOfView = f;
+                targetCamera.fieldOfView = centralFieldOfView;
                 targetCamera.ResetAspect();
             }
         }
@@ -72,7 +75,8 @@ namespace UC.Fisheye
         {
             var aspect = targetCamera.aspect;
             var lensCoeff = fieldOfView / 180;
-            if (lens == LensType.CircularHorizontal) lensCoeff /= aspect;
+            if (lens == LensType.Circular) lensCoeff /= Mathf.Min(aspect, 1);
+            else if (lens == LensType.CircularHorizontal) lensCoeff /= aspect;
             else if (lens == LensType.Diagonal) lensCoeff /= Mathf.Sqrt(aspect * aspect + 1);
 
             material.SetTexture("_PeripheralTex", bufferTexture);
